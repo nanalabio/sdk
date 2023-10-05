@@ -1,0 +1,31 @@
+syntax = "proto3";
+package nanala.v1;
+
+option go_package = "github.com/nanalabio/sdk/pb/gen/go/nanala/v1;nanalav1";
+
+// In the future, direct communication with Nanala servers will be possible.
+// For now, this is an empty service.
+service NanalaService {
+  rpc Synthesize(SynthesizeRequest) returns (SynthesizeResponse);
+  //rpc Transform(TransformRequest) returns (TransformResponse);
+  //rpc RunPlateAssay(RunPlateAssayRequest) returns (RunPlateAssayResponse);
+}
+
+/*
+   
+   Synthesis requests
+   
+*/
+
+enum VectorBackbone {
+  VECTOR_BACKBONE_UNSPECIFIED = 0;
+  VECTOR_BACKBONE_POPENV3 = 1;
+}
+
+message SynthesizeRequest {
+  string sequence = 1;
+  VectorBackbone backbone = 2;
+}
+message SynthesizeResponse {
+  string full_sequence = 1;
+}

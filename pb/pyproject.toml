@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "nanala-sdk"
+version = "0.1.0"
+description = ""
+authors = ["Keoni Gandall <koeng101@gmail.com>"]
+readme = "README.md"
+packages = [{include = "nanala_sdk"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+betterproto = {extras = ["compiler"], version = "^1.2.5"}
+grpcio-tools = "^1.59.0"
+protobuf = "^4.24.4"
+grpclib = "^0.4.6"
+grpcio = "^1.59.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

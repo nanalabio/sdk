@@ -2,6 +2,7 @@
 # sources: nanala/v1/nanala.proto
 # plugin: python-betterproto
 from dataclasses import dataclass
+from typing import List
 
 import betterproto
 import grpclib
@@ -13,6 +14,26 @@ class VectorBackbone(betterproto.Enum):
 
 
 @dataclass
+class Fragment(betterproto.Message):
+    id: str = betterproto.string_field(1)
+    sequence: str = betterproto.string_field(2)
+    forward_overhang: str = betterproto.string_field(3)
+    reverse_overhang: str = betterproto.string_field(4)
+
+
+@dataclass
+class GoldenGateRequest(betterproto.Message):
+    fragments: List["Fragment"] = betterproto.message_field(1)
+    backbone: "VectorBackbone" = betterproto.enum_field(2)
+
+
+@dataclass
+class GoldenGateResponse(betterproto.Message):
+    id: str = betterproto.string_field(1)
+    full_sequence: str = betterproto.string_field(2)
+
+
+@dataclass
 class SynthesizeRequest(betterproto.Message):
     sequence: str = betterproto.string_field(1)
     backbone: "VectorBackbone" = betterproto.enum_field(2)
@@ -20,7 +41,8 @@ class SynthesizeRequest(betterproto.Message):
 
 @dataclass
 class SynthesizeResponse(betterproto.Message):
-    full_sequence: str = betterproto.string_field(1)
+    id: str = betterproto.string_field(1)
+    full_sequence: str = betterproto.string_field(2)
 
 
 class NanalaServiceStub(betterproto.ServiceStub):
@@ -28,6 +50,20 @@ class NanalaServiceStub(betterproto.ServiceStub):
     In the future, direct communication with Nanala servers will be possible.
     For now, this is an empty service.
     """
+
+    async def golden_gate(
+        self, *, fragments: List["Fragment"] = [], backbone: "VectorBackbone" = 0
+    ) -> GoldenGateResponse:
+        request = GoldenGateRequest()
+        if fragments is not None:
+            request.fragments = fragments
+        request.backbone = backbone
+
+        return await self._unary_unary(
+            "/nanala.v1.NanalaService/GoldenGate",
+            request,
+            GoldenGateResponse,
+        )
 
     async def synthesize(
         self, *, sequence: str = "", backbone: "VectorBackbone" = 0

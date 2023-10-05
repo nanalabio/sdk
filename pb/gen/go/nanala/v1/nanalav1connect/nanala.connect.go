@@ -27,6 +27,7 @@ const (
 
 // NanalaServiceClient is a client for the nanala.v1.NanalaService service.
 type NanalaServiceClient interface {
+	GoldenGate(context.Context, *connect_go.Request[v1.GoldenGateRequest]) (*connect_go.Response[v1.GoldenGateResponse], error)
 	Synthesize(context.Context, *connect_go.Request[v1.SynthesizeRequest]) (*connect_go.Response[v1.SynthesizeResponse], error)
 }
 
@@ -40,6 +41,11 @@ type NanalaServiceClient interface {
 func NewNanalaServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts ...connect_go.ClientOption) NanalaServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &nanalaServiceClient{
+		goldenGate: connect_go.NewClient[v1.GoldenGateRequest, v1.GoldenGateResponse](
+			httpClient,
+			baseURL+"/nanala.v1.NanalaService/GoldenGate",
+			opts...,
+		),
 		synthesize: connect_go.NewClient[v1.SynthesizeRequest, v1.SynthesizeResponse](
 			httpClient,
 			baseURL+"/nanala.v1.NanalaService/Synthesize",
@@ -50,7 +56,13 @@ func NewNanalaServiceClient(httpClient connect_go.HTTPClient, baseURL string, op
 
 // nanalaServiceClient implements NanalaServiceClient.
 type nanalaServiceClient struct {
+	goldenGate *connect_go.Client[v1.GoldenGateRequest, v1.GoldenGateResponse]
 	synthesize *connect_go.Client[v1.SynthesizeRequest, v1.SynthesizeResponse]
+}
+
+// GoldenGate calls nanala.v1.NanalaService.GoldenGate.
+func (c *nanalaServiceClient) GoldenGate(ctx context.Context, req *connect_go.Request[v1.GoldenGateRequest]) (*connect_go.Response[v1.GoldenGateResponse], error) {
+	return c.goldenGate.CallUnary(ctx, req)
 }
 
 // Synthesize calls nanala.v1.NanalaService.Synthesize.
@@ -60,6 +72,7 @@ func (c *nanalaServiceClient) Synthesize(ctx context.Context, req *connect_go.Re
 
 // NanalaServiceHandler is an implementation of the nanala.v1.NanalaService service.
 type NanalaServiceHandler interface {
+	GoldenGate(context.Context, *connect_go.Request[v1.GoldenGateRequest]) (*connect_go.Response[v1.GoldenGateResponse], error)
 	Synthesize(context.Context, *connect_go.Request[v1.SynthesizeRequest]) (*connect_go.Response[v1.SynthesizeResponse], error)
 }
 
@@ -70,6 +83,11 @@ type NanalaServiceHandler interface {
 // and JSON codecs. They also support gzip compression.
 func NewNanalaServiceHandler(svc NanalaServiceHandler, opts ...connect_go.HandlerOption) (string, http.Handler) {
 	mux := http.NewServeMux()
+	mux.Handle("/nanala.v1.NanalaService/GoldenGate", connect_go.NewUnaryHandler(
+		"/nanala.v1.NanalaService/GoldenGate",
+		svc.GoldenGate,
+		opts...,
+	))
 	mux.Handle("/nanala.v1.NanalaService/Synthesize", connect_go.NewUnaryHandler(
 		"/nanala.v1.NanalaService/Synthesize",
 		svc.Synthesize,
@@ -80,6 +98,10 @@ func NewNanalaServiceHandler(svc NanalaServiceHandler, opts ...connect_go.Handle
 
 // UnimplementedNanalaServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedNanalaServiceHandler struct{}
+
+func (UnimplementedNanalaServiceHandler) GoldenGate(context.Context, *connect_go.Request[v1.GoldenGateRequest]) (*connect_go.Response[v1.GoldenGateResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("nanala.v1.NanalaService.GoldenGate is not implemented"))
+}
 
 func (UnimplementedNanalaServiceHandler) Synthesize(context.Context, *connect_go.Request[v1.SynthesizeRequest]) (*connect_go.Response[v1.SynthesizeResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("nanala.v1.NanalaService.Synthesize is not implemented"))

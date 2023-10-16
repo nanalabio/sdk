@@ -13,6 +13,25 @@ class VectorBackbone(betterproto.Enum):
     VECTOR_BACKBONE_POPENV3 = 1
 
 
+class PartType(betterproto.Enum):
+    PART_TYPE_UNSPECIFIED = 0
+    PART_TYPE_NONE = 1
+    PART_TYPE_PROMOTER = 2
+    PART_TYPE_RBS = 3
+    PART_TYPE_CDS = 4
+    PART_TYPE_TERMINATOR = 5
+    PART_TYPE_PROMOTER_RBS = 6
+    PART_TYPE_N_TAG = 7
+    PART_TYPE_CDS_FOR_N_TAG = 8
+    PART_TYPE_IDENTITY = 9
+    PART_TYPE_TERMINATOR_FOR_C_TAG = 10
+    PART_TYPE_C_TAG = 11
+    PART_TYPE_TARGET_SELECTIVE_MARKER = 12
+    PART_TYPE_TARGET_ORI_OR_DOWNSTREAM_HOMOLOGY = 13
+    PART_TYPE_UPSTREAM_HOMOLOGY = 14
+    PART_TYPE_RBS_CDS = 15
+
+
 @dataclass
 class Fragment(betterproto.Message):
     id: str = betterproto.string_field(1)
@@ -36,13 +55,15 @@ class GoldenGateResponse(betterproto.Message):
 @dataclass
 class SynthesizeRequest(betterproto.Message):
     sequence: str = betterproto.string_field(1)
-    backbone: "VectorBackbone" = betterproto.enum_field(2)
+    part_type: "PartType" = betterproto.enum_field(2)
+    backbone: "VectorBackbone" = betterproto.enum_field(3)
 
 
 @dataclass
 class SynthesizeResponse(betterproto.Message):
     id: str = betterproto.string_field(1)
     full_sequence: str = betterproto.string_field(2)
+    part_type: "PartType" = betterproto.enum_field(3)
 
 
 class NanalaServiceStub(betterproto.ServiceStub):
@@ -66,10 +87,15 @@ class NanalaServiceStub(betterproto.ServiceStub):
         )
 
     async def synthesize(
-        self, *, sequence: str = "", backbone: "VectorBackbone" = 0
+        self,
+        *,
+        sequence: str = "",
+        part_type: "PartType" = 0,
+        backbone: "VectorBackbone" = 0,
     ) -> SynthesizeResponse:
         request = SynthesizeRequest()
         request.sequence = sequence
+        request.part_type = part_type
         request.backbone = backbone
 
         return await self._unary_unary(

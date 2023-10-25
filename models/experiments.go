@@ -2,6 +2,16 @@ package models
 
 type Experiment struct {
 	Synthesize []SynthesisRequest `json:"synthesis_request"`
+	Logs       []string           `json:"logs"`
+	Error      string             `json:"error"`
+}
+
+func (e *Experiment) Println(str string) {
+	e.Logs = append(e.Logs, sr)
+}
+
+func (e *Experiment) Error(str string) {
+	e.Error = str
 }
 
 //*****************************************************************************

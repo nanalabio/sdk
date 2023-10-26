@@ -1,17 +1,30 @@
 package models
 
+import (
+	"encoding/json"
+	"io"
+)
+
 type Experiment struct {
+	Name       string             `json:"name"`
 	Synthesize []SynthesisRequest `json:"synthesis_request"`
 	Logs       []string           `json:"logs"`
-	Error      string             `json:"error"`
+	ErrorLog   string             `json:"error"`
 }
 
 func (e *Experiment) Println(str string) {
-	e.Logs = append(e.Logs, sr)
+	e.Logs = append(e.Logs, str)
 }
 
-func (e *Experiment) Error(str string) {
-	e.Error = str
+func (e *Experiment) Error(w io.Writer, str string) {
+	e.ErrorLog = str
+	e.Write(w)
+}
+
+func (e *Experiment) Write(w io.Writer) {
+	encoder := json.NewEncoder(w)
+	encoder.SetIndent("", "  ")
+	encoder.Encode(e)
 }
 
 //*****************************************************************************

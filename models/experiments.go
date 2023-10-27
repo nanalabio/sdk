@@ -86,8 +86,9 @@ func (e *Experiment) Write(w io.Writer) {
 //*****************************************************************************
 
 type SynthesisRequest struct {
-	Name     string `json:"name"`
-	Sequence string `json:"sequence"`
-	Vector   string `json:"vector"`
-	PartType string `json:"part_type"`
+	Name         string `json:"name"`
+	Sequence     string `json:"sequence"`
+	FullSequence string `json:"full_sequence"`
+	Vector       string `json:"vector"`
+	PartType     string `json:"part_type"`
 }
